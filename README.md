@@ -104,6 +104,9 @@ docker push kiananasirii/voting-frontend:latest</code></pre>
 <pre dir="ltr" align="left"><code>export KUBECONFIG="ir-central1-uniproj.config"
 kubectl get nodes</code></pre>
 
+> [!WARNING]
+> فایل کانفیگ کلاستر (`ir-central1-uniproj.config`) حاوی توکن‌ها و اطلاعات احراز هویت خصوصی شماست. به هیچ عنوان نباید این فایل را در مخازن عمومی گیت‌هاب (GitHub) آپلود یا Commit کنید. این فایل در `.gitignore` قرار گرفته است تا از آپلود تصادفی آن جلوگیری شود.
+
 ### گام ۳: اعمال منیفست‌ها
 
 <pre dir="ltr" align="left"><code>kubectl apply -f k8s/
