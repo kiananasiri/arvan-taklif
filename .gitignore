@@ -1,0 +1,9 @@
+# Ignore binaries
+kubectl
+
+# Ignore local config files if needed (uncomment if you want to keep your cluster config private)
+# ir-central1-uniproj.config
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>نظرسنجی ابزارهای زیرساخت</title>
+    <style>
+        body { font-family: Tahoma, sans-serif; background: #f4f4f9; display: flex; flex-direction: column; align-items: center; padding: 50px; }
+        .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
+        h1 { color: #333; text-align: center; }
+        .tool-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee; }
+        button { background: #326ce5; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #2553b5; }
+        .vote-count { font-size: 1.2em; font-weight: bold; color: #4caf50; }
+        #debug { margin-top: 20px; font-size: 0.8em; color: #777; text-align: center; direction: ltr;}
+    </style>
+    <script src="/env.js"></script>
+</head>
+<body>
+    <div class="card">
+        <h1>بهترین ابزار دواپس؟</h1>
+        
+        <div class="tool-row">
+            <span>Kubernetes</span>
+            <div>
+                <span class="vote-count" id="count-Kubernetes">0</span>
+                <button onclick="vote('Kubernetes')">رای بده</button>
+            </div>
+        </div>
+        <div class="tool-row">
+            <span>Ansible</span>
+            <div>
+                <span class="vote-count" id="count-Ansible">0</span>
+                <button onclick="vote('Ansible')">رای بده</button>
+            </div>
+        </div>
+        <div class="tool-row">
+            <span>Terraform</span>
+            <div>
+                <span class="vote-count" id="count-Terraform">0</span>
+                <button onclick="vote('Terraform')">رای بده</button>
+            </div>
+        </div>
+
+        <div id="debug"></div>
+    </div>
+
+    <script>
+        const apiUrl = window.ENV_BACKEND_URL || "http://localhost:3000";
+        document.getElementById('debug').innerText = `Backend API: ${apiUrl}`;
+
+        async function fetchVotes() {
+            try {
+                const response = await fetch(`${apiUrl}/api/votes`);
+                const data = await response.json();
+                data.forEach(item => {
+                    const countSpan = document.getElementById(`count-${item.tool}`);
+                    if(countSpan) countSpan.innerText = item.count;
+                });
+            } catch (e) {
+                console.error("Error fetching votes", e);
+            }
+        }
+
+        async function vote(toolName) {
+            try {
+                await fetch(`${apiUrl}/api/votes`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tool: toolName })
+                });
+                fetchVotes();
+            } catch (e) {
+                alert("خطا در ارتباط با سرور!");
+            }
+        }
+
+        fetchVotes();
+    </script>
+</body>
+</html>

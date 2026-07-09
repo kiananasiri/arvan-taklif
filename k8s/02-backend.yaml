@@ -1,0 +1,79 @@
+# Backend API for Arvan Cloud Kubernetes.
+# The image namespace below assumes you create/use the Docker Hub username
+# "kiananasirii". If Docker Hub asks you to pick a different username, replace
+# kiananasirii with that username before applying this manifest.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  labels:
+    app: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: kiananasirii/voting-backend:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: PORT
+              value: "3000"
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: voting-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: voting-config
+                  key: DB_PORT
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: voting-config
+                  key: DB_NAME
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: voting-config
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: DB_PASSWORD
+          readinessProbe:
+            httpGet:
+              path: /api/votes
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/votes
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  labels:
+    app: backend
+spec:
+  type: LoadBalancer
+  selector:
+    app: backend
+  ports:
+    - port: 80
+      targetPort: 3000
